@@ -1,0 +1,44 @@
+Design a Twitter-like social network website for making posts and following users.
+
+
+Django project - project4
+Use Python, Javascript, HTML, CSS
+
+### Requirements 
+
++ New Post - signed in users to write a new text-based post with a textarea and clicking a button to submit the post
+	* There is a screenshot in top of specs showing a sample
+
+* All Posts - takes the user to a page where they can see all posts from all users, with most recent posts first
+	* Posts include the username of the poster, post content itself, the date and time, and number of likes the post has
+
+* Profile Page - clicking on username should load user's profile page
+	* Display number of followers, and followees
+	* Display all posts for that user, in reverse chronological order
+	* For any other user who is signed in, the page should display Follow or Unfollow button (the logged in user should not see this on their profile)
+
+* Following - take the user to a page where they see all posts made by users that the current user follows
+	* Available to signed in users only
+
+* Pagination - 
+	* Only 10 posts on a single page
+	* If there are more than 10 posts, Next button should appear to take the user to the next page of posts
+	* On not first pages, there should be a Previous button as well
+	* On last page, there should be only a Previous button
+
+* Edit Post - only on own posts
+	* When Edit is clicked, the content of their post should be replaced with a textarea prepopulated with the original content
+	* Save button - with javascript to not reload the entire page
+	* For security, ensure that the application is designed such that it is not possible for a user via any route to edit another user's posts
+
+* Like and Unlike - 
+	* Using Javascript, we should asynchronously let the server know to update the like count (as via a call to fetch) and then update the post's like count displayed on the page, without requiring a reload of the entire page
+
+
+### Hints
+* fetch calls, some routes may be found in the previous project
+* May need additional models to be created, or even modify User to store necessary data
+* Django's Paginator class may be helpful for implementing pagination on the back-end (via Python) https://docs.djangoproject.com/en/3.0/topics/pagination/
+* Bootstrap's Pagination features may be helpful for displaying pages on the front-end (via HTML) https://getbootstrap.com/docs/4.4/components/pagination/
+
+

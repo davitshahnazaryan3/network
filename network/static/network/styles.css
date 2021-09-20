@@ -1,0 +1,12 @@
+.all-posts {
+    padding: 24px;
+    border-style: solid;
+    border-color: #777777;
+    border-radius: 5px;
+    border-width: 1px;
+    margin: 24px;
+}
+
+h1 {
+    margin: 24px;
+}
