@@ -9,7 +9,7 @@ Use Python, Javascript, HTML, CSS
 + New Post - signed in users to write a new text-based post with a textarea and clicking a button to submit the post
 	* There is a screenshot in top of specs showing a sample
 
-* All Posts - takes the user to a page where they can see all posts from all users, with most recent posts first
++ All Posts - takes the user to a page where they can see all posts from all users, with most recent posts first
 	* Posts include the username of the poster, post content itself, the date and time, and number of likes the post has
 
 * Profile Page - clicking on username should load user's profile page

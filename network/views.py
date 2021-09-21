@@ -14,6 +14,11 @@ def index(request):
     return render(request, "network/index.html")
 
 
+def get_posts(request):
+    posts = Post.objects.all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)
+
+
 @csrf_exempt
 @login_required
 def submit_post(request):

@@ -18,6 +18,7 @@ class Post(models.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "author": self.author.username,
             "body": self.body,
             "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
             "liked_by": [user.username for user in self.liked_by.all()],
