@@ -17,3 +17,7 @@ h1 {
 .heart-icon {
     color: red;
 }
+
+#profile-nav-link {
+    cursor: pointer;
+}

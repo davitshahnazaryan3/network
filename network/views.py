@@ -14,7 +14,11 @@ def index(request):
     return render(request, "network/index.html")
 
 
-def get_posts(request):
+def load_profile(request, username):
+    return render(request, "network/index.html")
+
+
+def get_posts(request, post_types):
     posts = Post.objects.all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
