@@ -15,10 +15,22 @@ def index(request):
 
 
 def load_profile(request, username):
-    return render(request, "network/index.html")
+    user = User.objects.get(username=username)
+    posts = Post.objects.filter(author=user)
+
+    response = {
+        'username': user.username,
+        'posts': [post.serialize() for post in posts],
+        'post_count': user.posts.count(),
+        'join_date': f'{user.date_joined.strftime("%B")} {user.date_joined.strftime("%Y")}',
+        'requested_by': request.user.username if request.user.is_authenticated else None,
+        # todo, followers and following
+    }
+
+    return JsonResponse(response, status=200)
 
 
-def get_posts(request, post_types):
+def get_posts(request):
     posts = Post.objects.all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 

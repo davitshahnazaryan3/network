@@ -3,13 +3,13 @@
 
 {% block body %}
 
+    <h1 id="title">All Posts</h1>
+
     <div id="profile-container">
 
     </div>
 
-    <h1 id="title">All Posts</h1>
-
-    <div class="all-posts" id="posts-container">
+    <div class="all-posts" id="post-form-container">
         {% if user.is_authenticated %}
             <div id="new-post-view">
                 <form id="post-form">

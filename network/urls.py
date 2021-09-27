@@ -10,6 +10,6 @@ urlpatterns = [
 
     # # API Routes
     path("submit_post", views.submit_post, name="submit-post"),
-    path("posts/<str:post_types>", views.get_posts, name="get-posts"),
+    path("posts", views.get_posts, name="get-posts"),
     path("user/<str:username>", views.load_profile, name="load-profile"),
 ]
