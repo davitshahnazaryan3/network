@@ -3,7 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // load authenticated user profile
     const profile_nav_link = document.querySelector('#profile-nav-link');
     if (profile_nav_link) {
-        profile_nav_link.addEventListener('click', () => load_view('profile'));
+        // add event listener to authenticated username
+        profile_nav_link.addEventListener('click', () => load_view(profile_nav_link.textContent));
         // submit a post
         document.querySelector('#post-form').addEventListener('submit', submit_post);
     }
@@ -18,35 +19,107 @@ function load_view(view) {
     const post_form_container = document.querySelector('#post-form-container');
     const profile_container = document.querySelector('#profile-container');
 
-    profile_container.style.display = (view === 'profile') ? 'block' : 'none';
-    post_form_container.style.display = (view === 'index') ? 'block' : 'none';
+    profile_container.style.display = (view === 'index') ? 'none' : 'block';
+    if (post_form_container) {
+        post_form_container.style.display = (view === 'index') ? 'block' : 'none';
+    }
 
     // load posts
     load_posts(view);
 }
 
-function show_profile_info(data) {
+function load_posts (view) {
+    // url to fetch
+    let url = '/posts';
+
+    // remove all posts from the DOM
+    const container = document.querySelector('#post-container');
+    container.innerHTML = "";
+
+    // authenticated user
+    const profile_nav_link = document.querySelector('#profile-nav-link');
+    let auth_username = ''
+    auth_username = (profile_nav_link) ? profile_nav_link.textContent : '';
+
+    if (view === "index") {
+        // make GET request to url route
+        fetch(url)
+        .then(response => response.json())
+
+        .then(posts => {
+
+            posts.forEach(post => show_post({
+                'container': container,
+                'post': post,
+                'auth_username': auth_username,
+                'username': 'none',
+            }))
+        })
+    } else {
+        // update request url
+        url = `/user/${view}`;
+
+        // make GET request to profile
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            // change title name
+            document.querySelector('#title').innerHTML = data.username;
+
+            // show profile data
+            show_profile_info(data, auth_username);
+
+            // request posts by username
+            data.posts.forEach(post => show_post({
+                'container': container,
+                'post': post,
+                'auth_username': auth_username,
+                'username': view,
+            }))
+        })
+    }
+}
+
+function show_profile_info(data, auth_username) {
 
     const container = document.querySelector('#profile-container');
     container.innerHTML = "";
 
-    // remove all posts from the DOM
-    const post_container = document.querySelector('#post-container');
-    post_container.innerHTML = "";
 
-    // make GET request to '/profile/{username}' route
-    // todo, followers and following
     container.innerHTML = `
         <ul class="list-group">
             <li class="list-group-item"><b>Date joined: </b><span>${data['join_date']}</span></li>
-            <li class="list-group-item"><b>Followers: </b><span>0</span></li>
-            <li class="list-group-item"><b>Following: </b><span>0</span></li>
+            <li class="list-group-item" id="followers_count"><b>Followers: </b><span>${data['following']}</span></li>
+            <li class="list-group-item" id="following_count"><b>Following: </b><span>${data['followers']}</span></li>
         </ul>
     `
+
+    if (auth_username && auth_username != data['username']) {
+        // follow or unfollow button, and add event listener to button for PUT request
+        const follow = document.createElement('button');
+        follow.innerHTML = (data['follows']) ? "Unfollow" : "Follow";
+        follow.id = "follow-button";
+        follow.className = "button btn btn-primary";
+
+        // add event listener to follow button
+        follow.addEventListener('click', function () {
+            fetch('/user/' + data['username'] + '/follow', {
+                method: 'PUT',
+                body: JSON.stringify({ follows : !data['follows']})
+            })
+
+            // reload profile
+            load_view(data['username']);
+        });
+
+        // add to container
+        container.appendChild(follow);
+    }
 }
 
+
 function show_post(context) {
-    console.log(context.post);
+
     // like symbol
     var heart_symbol = '&#9825';
 
@@ -54,7 +127,7 @@ function show_post(context) {
     div.className = "post";
 
     // like symbol
-    if (context.username_ele && context.post['liked_by'].includes(context.username)) {
+    if (context.auth_username && context.post['liked_by'].includes(context.auth_username)) {
         var heart_symbol = '&hearts';
     } else {
         var heart_symbol = '&#9825';
@@ -68,67 +141,10 @@ function show_post(context) {
     `;
 
     context.container.appendChild(div);
-}
 
-function load_posts (view) {
-    // like symbol
-    var heart_symbol = '&#9825';
-
-    // get logged in username
-    const username_ele = document.getElementById('username');
-    if (username_ele) {
-        const username = JSON.parse(document.getElementById('username').textContent);
-    } else {
-        // hide post form
-        document.querySelector('#post-form-container').style.display = 'none';
-    }
-
-    // request url
-    let url = '/posts';
-    if (view === "profile") {
-        url = `/user/${document.querySelector('#profile-nav-link').textContent}`;
-    } else {
-        url = '/posts';
-    }
-
-    // remove all posts from the DOM
-    const container = document.querySelector('#post-container');
-    container.innerHTML = "";
-
-    if (view === "profile") {
-
-        fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            // change title name
-            document.querySelector('#title').innerHTML = data.username;
-
-            show_profile_info(data);
-
-            data.posts.forEach(post => show_post({
-                'container': container,
-                'post': post,
-                'username_ele': username_ele,
-                'username': username,
-            }))
-        })
-
-    } else {
-
-        // make GET request to url route
-        fetch(url)
-        .then(response => response.json())
-
-        .then(posts => {
-
-            posts.forEach(post => show_post({
-                'container': container,
-                'post': post,
-                'username_ele': 'none',
-                'username': 'none',
-            }))
-        })
-    }
+    // add event listener to username
+    const title = div.querySelector(".post-title");
+    title.addEventListener('click', () => load_view(context.post['author']));
 }
 
 function submit_post(event) {

@@ -14,9 +14,45 @@ def index(request):
     return render(request, "network/index.html")
 
 
+@csrf_exempt
+@login_required
+def follow(request, username):
+
+    if request.method != "PUT":
+        return JsonResponse({
+            "error": "PUT request required."
+        }, status=400)
+
+    # Get user
+    user = User.objects.get(username=username)
+
+    # make sure authenticated user cannot follow themselves
+    if request.user == user:
+        return HttpResponse("You cannot follow yourself", status=403)
+
+    # check whether authenticated user is following or not following the current user
+    follow_object = user.following.filter(follower=request.user)
+
+    if follow_object:
+        follow_object.delete()
+    else:
+        # otherwise create follow object
+        follow_object = Following(follower=request.user, following=user)
+        follow_object.save()
+
+    return HttpResponse(status=204)
+
+
 def load_profile(request, username):
     user = User.objects.get(username=username)
     posts = Post.objects.filter(author=user)
+
+    if not request.user.is_authenticated:
+        follows = False
+    elif user.following.filter(follower=request.user):
+        follows = True
+    else:
+        follows = False
 
     response = {
         'username': user.username,
@@ -24,7 +60,9 @@ def load_profile(request, username):
         'post_count': user.posts.count(),
         'join_date': f'{user.date_joined.strftime("%B")} {user.date_joined.strftime("%Y")}',
         'requested_by': request.user.username if request.user.is_authenticated else None,
-        # todo, followers and following
+        'following': user.following.count(),
+        'followers': user.follower.count(),
+        'follows': follows or None,
     }
 
     return JsonResponse(response, status=200)

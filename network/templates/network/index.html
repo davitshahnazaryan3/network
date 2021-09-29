@@ -6,11 +6,10 @@
     <h1 id="title">All Posts</h1>
 
     <div id="profile-container">
-
     </div>
 
-    <div class="all-posts" id="post-form-container">
-        {% if user.is_authenticated %}
+    {% if user.is_authenticated %}
+        <div class="all-posts" id="post-form-container">
             <div id="new-post-view">
                 <form id="post-form">
                     <div style="font-size: 24px; margin-bottom: 12px;"><strong>New Post</strong></div>
@@ -18,8 +17,8 @@
                     <input type="submit" class="btn btn-primary" value="Post" style="margin-top: 6px;"/>
                 </form>
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 
     <div id="post-container">
     </div>
