@@ -32,7 +32,6 @@ def follow(request, username):
 
     # check whether authenticated user is following or not following the current user
     follow_object = user.following.filter(follower=request.user)
-
     if follow_object:
         follow_object.delete()
     else:
@@ -69,7 +68,15 @@ def load_profile(request, username):
 
 
 def get_posts(request):
-    posts = Post.objects.all()
+    following = request.GET.get("following") or None
+
+    # display posts by user that request.user is following
+    if following:
+        follower = request.user.follower.filter()
+        following = User.objects.filter(id__in=follower.values('following'))
+        posts = Post.objects.filter(author__in=following)
+    else:
+        posts = Post.objects.all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 

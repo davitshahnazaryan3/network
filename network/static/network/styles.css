@@ -21,7 +21,7 @@ h1 {
     color: red;
 }
 
-#profile-nav-link {
+#profile-nav-link, #following-nav-link {
     cursor: pointer;
 }
 

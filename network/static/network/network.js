@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
         profile_nav_link.addEventListener('click', () => load_view(profile_nav_link.textContent));
         // submit a post
         document.querySelector('#post-form').addEventListener('submit', submit_post);
+        // add event listener to following
+        document.querySelector('#following-nav-link').addEventListener('click',  () => load_view('following'));
     }
 
     // display the posts
@@ -19,7 +21,8 @@ function load_view(view) {
     const post_form_container = document.querySelector('#post-form-container');
     const profile_container = document.querySelector('#profile-container');
 
-    profile_container.style.display = (view === 'index') ? 'none' : 'block';
+    profile_container.style.display = (view === 'index' || view === 'following') ? 'none' : 'block';
+
     if (post_form_container) {
         post_form_container.style.display = (view === 'index') ? 'block' : 'none';
     }
@@ -41,13 +44,18 @@ function load_posts (view) {
     let auth_username = ''
     auth_username = (profile_nav_link) ? profile_nav_link.textContent : '';
 
-    if (view === "index") {
+    if (view === "index" || view === "following") {
+
+        // display posts of users that the request.user is following only?
+        if (view === "following") {
+            url = url.concat(`?following=true`)
+            document.querySelector('#title').innerHTML = "Following";
+        }
+
         // make GET request to url route
         fetch(url)
         .then(response => response.json())
-
         .then(posts => {
-
             posts.forEach(post => show_post({
                 'container': container,
                 'post': post,
@@ -109,14 +117,13 @@ function show_profile_info(data, auth_username) {
             })
 
             // reload profile
-            load_view(data['username']);
+            .then(response => load_view(data['username']))
         });
 
         // add to container
         container.appendChild(follow);
     }
 }
-
 
 function show_post(context) {
 
