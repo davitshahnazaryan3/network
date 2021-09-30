@@ -16,6 +16,32 @@ def index(request):
 
 @csrf_exempt
 @login_required
+def like_post(request, id):
+    data = json.loads(request.body)
+
+    # get the post by id
+    post = Post.objects.get(id=id)
+
+    # get status of liked button (like or unlike)
+    status = data["state"]
+
+    if status == "like":
+        post.liked_by.remove(request.user)
+    else:
+        post.liked_by.add(request.user)
+    post.save()
+
+    # return JSON of new likes count and liked button status
+    response = {
+        'state': 'unlike' if status == "like" else "like",
+        'likes': post.liked_by.count(),
+    }
+
+    return JsonResponse(response, status=200)
+
+
+@csrf_exempt
+@login_required
 def follow(request, username):
 
     if request.method != "PUT":
