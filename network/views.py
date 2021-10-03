@@ -16,6 +16,24 @@ def index(request):
 
 @csrf_exempt
 @login_required
+def edit_post(request, id):
+    # get the post by id
+    post = Post.objects.get(id=id)
+
+    # only author of the post may edit it
+    if request.user != post.author:
+        return HttpResponse("No permission to edit the post", status=403)
+
+    data = json.loads(request.body)
+    # new post content
+    post.body = data["body"]
+    post.save()
+
+    return JsonResponse({'body': data['body']}, status=200)
+
+
+@csrf_exempt
+@login_required
 def like_post(request, id):
     data = json.loads(request.body)
 

@@ -12,12 +12,12 @@ Use Python, Javascript, HTML, CSS
 + All Posts - takes the user to a page where they can see all posts from all users, with most recent posts first
 	* Posts include the username of the poster, post content itself, the date and time, and number of likes the post has
 
-* Profile Page - clicking on username should load user's profile page
++ Profile Page - clicking on username should load user's profile page
 	* Display number of followers, and followees
 	* Display all posts for that user, in reverse chronological order
 	* For any other user who is signed in, the page should display Follow or Unfollow button (the logged in user should not see this on their profile)
 
-* Following - take the user to a page where they see all posts made by users that the current user follows
++ Following - take the user to a page where they see all posts made by users that the current user follows
 	* Available to signed in users only
 
 * Pagination - 
@@ -26,12 +26,12 @@ Use Python, Javascript, HTML, CSS
 	* On not first pages, there should be a Previous button as well
 	* On last page, there should be only a Previous button
 
-* Edit Post - only on own posts
++ Edit Post - only on own posts
 	* When Edit is clicked, the content of their post should be replaced with a textarea prepopulated with the original content
 	* Save button - with javascript to not reload the entire page
 	* For security, ensure that the application is designed such that it is not possible for a user via any route to edit another user's posts
 
-* Like and Unlike - 
++ Like and Unlike - 
 	* Using Javascript, we should asynchronously let the server know to update the like count (as via a call to fetch) and then update the post's like count displayed on the page, without requiring a reload of the entire page
 
 

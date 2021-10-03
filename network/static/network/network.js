@@ -131,12 +131,52 @@ function show_profile_info(data, auth_username) {
     }
 }
 
+function edit_post(post, postID) {
+
+    // create the button
+    const button = document.createElement('button');
+    button.type = "button";
+    button.className = "edit-button btn btn-secondary";
+    button.innerHTML = "Edit";
+
+    // add event listener to button
+    button.addEventListener('click', () => {
+
+        const body = post.querySelector(".card-text");
+        const textarea = post.querySelector(".text-editor");
+        // if button text is Edit
+        if (button.innerHTML === "Edit") {
+            button.innerHTML = "Save";
+            body.style.display = "none";
+            textarea.style.display = "block";
+            textarea.value = body.innerHTML;
+        } else {
+            // Save button is clicked, create a PUT request to save new post body
+            fetch(`post/${postID}`, {
+                method: 'PUT',
+                credentials: 'same-origin',
+                body: JSON.stringify({'body': textarea.value})
+            })
+            // Once the new data is saved, go to default
+            .then(() => {
+                button.innerHTML = "Edit";
+                body.innerHTML = textarea.value;
+                body.style.display = "block";
+                textarea.style.display = "none";
+            })
+        }
+    })
+
+    return button
+}
+
 function show_post(context) {
 
-    // like symbol
+    // initialize like symbol and label for className
     var heart_symbol = '&#9825';
     var heart_label = "unlike";
 
+    // create a div element for post content
     let div = document.createElement('div');
     div.className = "post";
 
@@ -149,12 +189,16 @@ function show_post(context) {
         var heart_label = "unlike";
     }
 
+    // post content
     div.innerHTML = `
         <h3 class="post-title card-title">${context.post['author']}</h3>
         <p class="card-text">${context.post['body']}</p>
         <h6 class="card-subtitle mb-2 text-muted">${context.post['timestamp']}</h6>
         <p class="heart-icon"></p>
+        <textarea class="text-editor form-control" style="display:none"></textarea>
     `;
+
+    // like button consisting of like icon and number of likes
     const heart_icon = document.createElement('span');
     heart_icon.className = `${heart_label}-heart`;
     heart_icon.innerHTML = `${heart_symbol} `
@@ -165,7 +209,15 @@ function show_post(context) {
     likes.innerHTML = `${context.post['liked_by'].length}`
     div.querySelector(".heart-icon").appendChild(likes);
 
-    // add event listener to username
+    // edit post button if logged in user is post author
+    if (context.auth_username === context.post['author']) {
+        editButton = edit_post(div, context.post.id);
+
+        // add to div
+        div.appendChild(editButton);
+    }
+
+    // add event listener to username (to load user profile)
     const title = div.querySelector(".post-title");
     title.addEventListener('click', () => load_view(context.post['author']));
 
@@ -217,8 +269,4 @@ function like_post (post, context) {
         post.querySelector(`.${data['state']}-heart`).innerHTML = (data['state'] === 'like') ? `${'&#9829'} ` : `${'&#9825'} `
         post.querySelector(".counter").innerHTML = data['likes'];
     })
-}
-
-function edit_post () {
-
 }
