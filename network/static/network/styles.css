@@ -21,7 +21,7 @@ h1 {
     color: red;
 }
 
-#profile-nav-link, #following-nav-link, .heart-icon {
+#profile-nav-link, #following-nav-link, .heart-icon, .page-link {
     cursor: pointer;
 }
 
@@ -33,4 +33,14 @@ h1 {
     margin-left: 24px;
     margin-right: 24px;
     margin-bottom: 6px;
+}
+
+.pagination {
+    margin-left: 24px;
+}
+
+#page-number {
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-top: 24px;
 }

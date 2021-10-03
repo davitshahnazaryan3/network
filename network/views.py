@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
+from django.core.paginator import Paginator
 import json
 
 from .models import *
@@ -89,6 +90,8 @@ def follow(request, username):
 def load_profile(request, username):
     user = User.objects.get(username=username)
     posts = Post.objects.filter(author=user)
+    n_posts = int(request.GET.get("nPosts")) or 10
+    page_number = int(request.GET.get("page")) or 1
 
     if not request.user.is_authenticated:
         follows = False
@@ -96,6 +99,10 @@ def load_profile(request, username):
         follows = True
     else:
         follows = False
+
+    # Pagination
+    paginator = Paginator(posts, n_posts)
+    posts = paginator.get_page(page_number)
 
     response = {
         'username': user.username,
@@ -106,6 +113,9 @@ def load_profile(request, username):
         'following': user.following.count(),
         'followers': user.follower.count(),
         'follows': follows or None,
+        'next_page': posts.has_next(),
+        'previous_page': posts.has_previous(),
+        'total_pages': paginator.num_pages,
     }
 
     return JsonResponse(response, status=200)
@@ -113,6 +123,8 @@ def load_profile(request, username):
 
 def get_posts(request):
     following = request.GET.get("following") or None
+    n_posts = int(request.GET.get("nPosts")) or 10
+    page_number = int(request.GET.get("page")) or 1
 
     # display posts by user that request.user is following
     if following:
@@ -121,7 +133,19 @@ def get_posts(request):
         posts = Post.objects.filter(author__in=following)
     else:
         posts = Post.objects.all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+
+    # Pagination
+    paginator = Paginator(posts, n_posts)
+    posts = paginator.get_page(page_number)
+
+    response = {
+        'posts': [post.serialize() for post in posts],
+        'next_page': posts.has_next(),
+        'previous_page': posts.has_previous(),
+        'total_pages': paginator.num_pages,
+    }
+
+    return JsonResponse(response, safe=False)
 
 
 @csrf_exempt

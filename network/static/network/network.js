@@ -1,4 +1,14 @@
+// Posts per page and page number and current View
+const nPosts = 10;
+let pageNumber = 1;
+let currentView = 'index'
+
+
 document.addEventListener('DOMContentLoaded', function() {
+
+    // Event listeners to previous and next page buttons
+    document.querySelector('#previous-page').addEventListener('click', onClickPreviousPage);
+    document.querySelector('#next-page').addEventListener('click', onClickNextPage);
 
     // load authenticated user profile
     const profile_nav_link = document.querySelector('#profile-nav-link');
@@ -16,7 +26,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+function onClickPreviousPage() {
+    pageNumber--;
+    load_posts(currentView);
+}
+
+function onClickNextPage() {
+    pageNumber++;
+    load_posts(currentView)
+}
+
+function updatePagination(data) {
+    document.querySelector('#previous-page').style.display = data['previous_page'] ? 'block' : 'none';
+
+    document.querySelector('#next-page').style.display = data['next_page'] ? 'block' : 'none';
+
+    document.querySelector('#page-number').innerHTML = `Page ${pageNumber} of ${data['total_pages']}`;
+}
+
 function load_view(view) {
+    currentView = view;
+    pageNumber = 1;
+
     const post_container = document.querySelector('#post-container');
     const post_form_container = document.querySelector('#post-form-container');
     const profile_container = document.querySelector('#profile-container');
@@ -28,12 +59,13 @@ function load_view(view) {
     }
 
     // load posts
-    load_posts(view);
+    load_posts(currentView);
 }
 
 function load_posts (view) {
+
     // url to fetch
-    let url = '/posts';
+    let url = `/posts?page=${pageNumber}&nPosts=${nPosts}`;
 
     // remove all posts from the DOM
     const container = document.querySelector('#post-container');
@@ -48,24 +80,26 @@ function load_posts (view) {
 
         // display posts of users that the request.user is following only?
         if (view === "following") {
-            url = url.concat(`?following=true`)
+            url = url.concat(`&following=true`)
             document.querySelector('#title').innerHTML = "Following";
         }
 
         // make GET request to url route
         fetch(url)
         .then(response => response.json())
-        .then(posts => {
-            posts.forEach(post => show_post({
+        .then(data => {
+            data.posts.forEach(post => show_post({
                 'container': container,
                 'post': post,
                 'auth_username': auth_username,
                 'username': 'none',
             }))
+
+            updatePagination(data);
         })
     } else {
         // update request url
-        url = `/user/${view}`;
+        url = `/user/${view}?page=${pageNumber}&nPosts=${nPosts}`;
 
         // make GET request to profile
         fetch(url)
@@ -84,6 +118,7 @@ function load_posts (view) {
                 'auth_username': auth_username,
                 'username': view,
             }))
+            updatePagination(data);
         })
     }
 }
