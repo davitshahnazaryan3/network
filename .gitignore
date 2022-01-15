@@ -1,0 +1,4 @@
+/env/
+/venv/
+.env
+docker_secret.txt
