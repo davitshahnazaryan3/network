@@ -2,3 +2,5 @@
 /venv/
 .env
 docker_secret.txt
+db.sqlite3
+.flow/
