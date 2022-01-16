@@ -4,3 +4,5 @@
 docker_secret.txt
 db.sqlite3
 .flow/
+docker-compose-dev.yml
+docker-compose-prod.yml
